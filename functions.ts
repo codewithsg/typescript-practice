@@ -14,7 +14,7 @@ type DescribableFunction = {
   description: string;
   (someArg: number): boolean;
 };
-function doSomething(fn: DescribableFunction) {
+function doSomething1(fn: DescribableFunction) {
   console.log(fn.description + " returned " + fn(6));
 }
 
@@ -22,7 +22,7 @@ function myFunc(someArg: number) {
   return someArg > 3;
 }
 myFunc.description = "do something function just";
-doSomething(myFunc);
+doSomething1(myFunc);
 
 /* Generic Function */
 function firstElement<T>(arr: T[]): T | undefined {
