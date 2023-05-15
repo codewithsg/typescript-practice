@@ -137,3 +137,207 @@ const todoInfo2:TTodoInfo2 = {
 }
 
 console.log(todoInfo2);
+
+
+
+
+/* Exclude<UnionType, ExcludeMembers> */
+/* Constructs a type by execluding from UnionType all union members that are assignable to ExcludeMembers */
+
+type T0 = Exclude<'a' | 'b' | 'c' ,'a'>
+// type T0 = "b" | "c"
+
+type T1 = Exclude<'a'|'b'|'c','a'|'c'>;
+// type T1 = "b"
+
+
+
+
+/* Extract<Type, Union> */
+/* Constructs a type by extracting from Type all union members that are assignable to Union. */
+type T2 = Extract<'a'|'b','a'|'c'>;
+// type T2 = "a"
+
+type T3 = Extract<string | number , boolean | number>;
+// type T3 = number
+
+type T4 = Extract<String | number | (()=>void),Function>
+// type T4 = () => void
+
+
+
+
+
+
+/* NonNullable<Type> */
+/* Constructs a type by excluding null and undefined from Type */
+type T5 = NonNullable<string | number | null>
+// type T5 = string | number
+
+type T6 = NonNullable<string[] | null | undefined>
+// type T6 = string[]
+
+
+
+
+/* Parameters<Type> */
+/* Constructs a tuple type from the types used in the parameters of a function Type. */
+declare function f1(arg:{a:number,b:string});
+
+type TP0 = Parameters<()=>string>;
+// type TP0 = []
+
+type TP1 = Parameters<(s:string)=>void>;
+// type TP1 = [s: string]
+
+type TP2 = Parameters<<T>(arg:T)=>void>
+// type TP2 = [arg: unknown]
+
+type TP3 = Parameters<typeof f1>;
+/* type TP3 = [arg: {
+  a: number;
+  b: string;
+}] */
+
+type TP4 = Parameters<any>;
+// type TP4 = unknown[]
+
+type TP5 = Parameters<never>;
+// type TP5 = never
+
+// type TP6 = Parameters<unknown>
+// type string, number, ... does not satisfy the constraint '(...args:any)=>any'
+// type TP6 = never
+
+
+
+
+/* ConstructorParameters<Type> */
+/* Constructs a tuple or array type from the types of a constructor function type. It produces a tuple type with all the parameter types (or the type never if Type is not a function). */
+type TC0 = ConstructorParameters<ErrorConstructor>;
+// type TC0 = [message?: string | undefined]
+
+type TC1 = ConstructorParameters<FunctionConstructor>;
+// type TC1 = string[]
+
+type TC2 = ConstructorParameters<RegExpConstructor>;
+// type TC2 = [pattern: string | RegExp, flags?: string | undefined]
+
+type TC3 = ConstructorParameters<any>;
+// type TC3 = unknown[]
+
+type TC4 = ConstructorParameters<DateConstructor>;
+// type TC4 = [value: string | number | Date]
+
+type TC5 = ConstructorParameters<ArrayConstructor>;
+// type TC5 = unknown[]
+
+// type TC6 = ConstructorParameters<PromiseConstructor>;
+// type TC6 = [executor: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void]
+
+
+
+
+/* ReturnType<Type> */
+/* Constructs a type consisting of the return type of function Type */
+type TR0 = ReturnType<()=>string>;
+// type TR0 = string
+
+type TR1 = ReturnType<(s:string)=>void>;
+// type TR1 = void
+
+type TR3 = ReturnType<<T>()=>T>;
+// type TR3 = unknown
+
+type TR4 = ReturnType<<T extends U, U extends number[]>()=>T>;
+// type TR4 = number[]
+
+type TR2 = ReturnType<typeof f1>;
+// type TR2 = any
+
+declare function f2():{a:number,b:string};
+type TR5 = ReturnType<typeof f2>;
+/* type TR5 = {
+  a: number;
+  b: string;
+} */
+
+
+
+
+/* InstanceType<Type> */
+/* Constructs a type consisting of the instance type of a constructor function in Type. */
+class C1{
+  x=0;
+  y=0;
+}
+
+type TI0 = InstanceType<typeof C1>;
+// type TI0 = C1
+
+type TI1 = InstanceType<any>;
+// type TI1 = any
+
+type TI2 = InstanceType<never>;
+// type TI2 = never
+
+
+
+
+/* ThisParameterType<Type> */
+/* Extracts the type of the this parameter for a function type, or unknown if the function type has no this parameter. */
+function toHex(this:Number){
+  return this.toString(16);
+}
+
+function numberToString(n:ThisParameterType<typeof toHex>){
+  return toHex.apply(n);
+}
+
+
+
+/* OmitThisParameter<Type> */
+/* Removes the this parameter from Type. If Type has no explicitly declared this parameter, the result is simple Type. Otherwise, a new function type with no this parameter is created from Type. Generics are erased and only the last overload signature is propagated into the new function type. */
+const fiveToHex:OmitThisParameter<typeof toHex> = toHex.bind(5);
+
+
+
+/* ThisType<Type> */
+/* This utility does not return a transformed type. Instead, it serves as a marker for a contextual this type. Note that the noImplicitThis flag must be enabled to use this utility. */
+type ObjectDescriptor<D,M> = {
+  data?:D;
+  methods?:M & ThisType<D & M>;
+}
+
+function makeObject<D,M>(desc:ObjectDescriptor<D,M>):D & M{
+  let data:Object = desc.data || {};
+  let methods:object = desc.methods || {};
+  return {...data,...methods} as D & M;
+}
+
+let obj1 = makeObject({
+  data:{x:0,y:0},
+  methods:{
+    moveBy(dx:number,dy:number){
+      this.x += dx;
+      this.y += dy;
+    }
+  }
+})
+
+obj1.x = 10;
+obj1.y = 20;
+obj1.moveBy(5,5);
+console.log(obj1);
+/* In the example above, the methods object in the argument to makeObject has a contextual type that includes ThisType<D & M> and therefore the type of this in methids within the methods object is {x:number, y:number} & {moveBy(dx:number,dy:number):void}. Notice how the type of the methods property simultaneously is an inference target and a source for the this type in methods. */
+/* The ThisType<T>  marker interface is simply an empty interface declared in lib.d.ts. Beyond being recognized in the contextual type of an object literal, the interface acts like any empty interface.*/
+
+
+
+
+/* Intrinsic String Manipulation Types */
+/* Uppercase<StringType> */
+/* Lowercase<StringType> */
+/* Capitalize<StringType> */
+/* Uncapitalize<StringType> */
+/* To help with string manipulation around template string literals, TypeScript includes a set of types which can be used in string manipulation within the type system. */

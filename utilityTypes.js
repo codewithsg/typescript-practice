@@ -55,3 +55,46 @@ var todoInfo2 = {
     description: 'Kindergarten closes at 3pm'
 };
 console.log(todoInfo2);
+/* type TR5 = {
+  a: number;
+  b: string;
+} */
+/* InstanceType<Type> */
+/* Constructs a type consisting of the instance type of a constructor function in Type. */
+var C1 = /** @class */ (function () {
+    function C1() {
+        this.x = 0;
+        this.y = 0;
+    }
+    return C1;
+}());
+// type TI2 = never
+/* ThisParameterType<Type> */
+/* Extracts the type of the this parameter for a function type, or unknown if the function type has no this parameter. */
+function toHex() {
+    return this.toString(16);
+}
+function numberToString(n) {
+    return toHex.apply(n);
+}
+/* OmitThisParameter<Type> */
+/* Removes the this parameter from Type. If Type has no explicitly declared this parameter, the result is simple Type. Otherwise, a new function type with no this parameter is created from Type. Generics are erased and only the last overload signature is propagated into the new function type. */
+var fiveToHex = toHex.bind(5);
+function makeObject(desc) {
+    var data = desc.data || {};
+    var methods = desc.methods || {};
+    return __assign(__assign({}, data), methods);
+}
+var obj1 = makeObject({
+    data: { x: 0, y: 0 },
+    methods: {
+        moveBy: function (dx, dy) {
+            this.x += dx;
+            this.y += dy;
+        }
+    }
+});
+obj1.x = 10;
+obj1.y = 20;
+obj1.moveBy(5, 5);
+console.log(obj1);
