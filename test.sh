@@ -5,4 +5,5 @@
 # tsc --target es2020 classes.ts && node classes.js
 # tsc utilityTypes.ts && node utilityTypes.js
 # tsc --experimentalDecorators  decorators.ts && node decorators.js
-tsc declarationMerging.ts && node declarationMerging.js
+# tsc declarationMerging.ts && node declarationMerging.js
+tsc iterables.ts && node iterables.js
