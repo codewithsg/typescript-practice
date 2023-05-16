@@ -3,4 +3,5 @@
 # tsc functions.ts && node functions.js
 # tsc objectTypes.ts && node objectTypes.js
 # tsc --target es2020 classes.ts && node classes.js
-tsc utilityTypes.ts && node utilityTypes.js
+# tsc utilityTypes.ts && node utilityTypes.js
+tsc --experimentalDecorators  decorators.ts && node decorators.js
